@@ -14,7 +14,7 @@ function Ventas() {
       .from('productos')
       .select('*')
 
-    setProductos(data)
+    setProductos(data || [])
   }
 
   const venderProducto = async (producto) => {

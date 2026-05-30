@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { supabase } from '../api/supabase'
 import Navbar from '../components/Navbar'
@@ -11,11 +10,16 @@ function Productos() {
   }, [])
 
   const obtenerProductos = async () => {
-    const { data } = await supabase
-      .from('v_rentabilidad_producto')
-      .select('*')
+    const { data, error } = await supabase
+    .from('v_rentabilidad_producto')
+    .select('*')
 
-    setProductos(data)
+    if (error) {
+      console.error(error)
+      return
+    }
+
+    setProductos(data || [])
   }
 
   return (
@@ -55,77 +59,3 @@ function Productos() {
 }
 
 export default Productos
-
-
-/*
-import Navbar from '../components/Navbar'
-
-function Productos() {
-  return (
-    <>
-      <Navbar />
-
-      <div className="p-10">
-        <h1>Productos 🍦</h1>
-      </div>
-    </>
-  )
-}
-
-export default Productos
-*/
-
-/*
-import { useEffect, useState } from 'react'
-import Navbar from '../components/Navbar'
-
-function Productos() {
-  const [productos, setProductos] = useState([])
-
-  useEffect(() => {
-    console.log('FUNCIONA')
-  }, [])
-
-  return (
-    <>
-      <Navbar />
-
-      <div className="p-10">
-        <h1 className="text-4xl font-bold">
-          Productos 🍦
-        </h1>
-      </div>
-    </>
-  )
-}
-
-export default Productos
-*/
-
-/*
-import { useEffect, useState } from 'react'
-import { supabase } from '../api/supabase'
-import Navbar from '../components/Navbar'
-
-function Productos() {
-  const [productos, setProductos] = useState([])
-
-  useEffect(() => {
-    console.log(supabase)
-  }, [])
-
-  return (
-    <>
-      <Navbar />
-
-      <div className="p-10">
-        <h1 className="text-4xl font-bold">
-          Productos 🍦
-        </h1>
-      </div>
-    </>
-  )
-}
-
-export default Productos
-*/
