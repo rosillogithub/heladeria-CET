@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../api/supabase'
 import Navbar from '../components/Navbar'
+import { useAuth } from '../context/AuthContext'
 
 function Productos() {
   const [productos, setProductos] = useState([])
+
+  const { user } = useAuth()
 
   useEffect(() => {
     obtenerProductos()
@@ -11,8 +14,8 @@ function Productos() {
 
   const obtenerProductos = async () => {
     const { data, error } = await supabase
-    .from('v_rentabilidad_producto')
-    .select('*')
+      .from('v_rentabilidad_producto')
+      .select('*')
 
     if (error) {
       console.error(error)
@@ -45,11 +48,20 @@ function Productos() {
                 Precio: ${producto.precio_publico}
               </p>
 
-              <p>Costo: ${producto.costo}</p>
+              {/* Solo empleado y admin */}
+              {(user?.rol === 'empleado' ||
+                user?.rol === 'admin') && (
+                <p>
+                  Costo: ${producto.costo}
+                </p>
+              )}
 
-              <p>
-                Rentabilidad: ${producto.rentabilidad}
-              </p>
+              {/* Solo admin */}
+              {user?.rol === 'admin' && (
+                <p>
+                  Rentabilidad: ${producto.rentabilidad}
+                </p>
+              )}
             </div>
           ))}
         </div>
