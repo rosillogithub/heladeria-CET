@@ -78,7 +78,7 @@ function Ventas() {
         await supabase
           .from('ingredientes')
           .update({
-            inventario: ingrediente.inventario - 1,
+            inventario: Number(ingrediente.inventario) - 1,
           })
           .eq('id', ingrediente.id)
       }
