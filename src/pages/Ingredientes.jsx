@@ -14,6 +14,8 @@ function Ingredientes() {
   const [esVegetariano, setEsVegetariano] = useState(false)
   const [esSano, setEsSano] = useState(true)
 
+  const [ingredienteEditando, setIngredienteEditando] = useState(null)
+
   useEffect(() => {
     obtenerIngredientes()
   }, [])
@@ -30,6 +32,18 @@ function Ingredientes() {
     }
 
     setIngredientes(data)
+  }
+
+  const limpiarFormulario = () => {
+    setNombre('')
+    setPrecio('')
+    setCalorias('')
+    setInventario('')
+    setTipo('base')
+    setSabor('')
+    setEsVegetariano(false)
+    setEsSano(true)
+    setIngredienteEditando(null)
   }
 
   const crearIngrediente = async () => {
@@ -54,16 +68,46 @@ function Ingredientes() {
       return
     }
 
-    setNombre('')
-    setPrecio('')
-    setCalorias('')
-    setInventario('')
-    setTipo('base')
-    setSabor('')
-    setEsVegetariano(false)
-    setEsSano(true)
-
+    limpiarFormulario()
     obtenerIngredientes()
+  }
+
+  const actualizarIngrediente = async () => {
+    const { error } = await supabase
+      .from('ingredientes')
+      .update({
+        nombre,
+        precio: Number(precio),
+        calorias: Number(calorias),
+        inventario: Number(inventario),
+        tipo,
+        sabor,
+        es_vegetariano: esVegetariano,
+        es_sano: esSano,
+      })
+      .eq('id', ingredienteEditando)
+
+    if (error) {
+      console.log(error)
+      alert('Error al actualizar ingrediente')
+      return
+    }
+
+    limpiarFormulario()
+    obtenerIngredientes()
+  }
+
+  const cargarIngrediente = (ingrediente) => {
+    setIngredienteEditando(ingrediente.id)
+
+    setNombre(ingrediente.nombre)
+    setPrecio(ingrediente.precio)
+    setCalorias(ingrediente.calorias)
+    setInventario(ingrediente.inventario)
+    setTipo(ingrediente.tipo)
+    setSabor(ingrediente.sabor || '')
+    setEsVegetariano(ingrediente.es_vegetariano)
+    setEsSano(ingrediente.es_sano)
   }
 
   const eliminarIngrediente = async (id) => {
@@ -98,7 +142,9 @@ function Ingredientes() {
 
         <div className="bg-white p-6 rounded-xl shadow-xl mb-8">
           <h2 className="text-2xl font-bold mb-4">
-            Nuevo Ingrediente
+            {ingredienteEditando
+              ? 'Editar Ingrediente'
+              : 'Nuevo Ingrediente'}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -145,13 +191,8 @@ function Ingredientes() {
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
             >
-              <option value="base">
-                Base
-              </option>
-
-              <option value="complemento">
-                Complemento
-              </option>
+              <option value="base">Base</option>
+              <option value="complemento">Complemento</option>
             </select>
           </div>
 
@@ -161,7 +202,8 @@ function Ingredientes() {
                 type="checkbox"
                 checked={esVegetariano}
                 onChange={(e) =>
-                  setEsVegetariano(e.target.checked)}
+                  setEsVegetariano(e.target.checked)
+                }
               />
               {' '}Vegetariano
             </label>
@@ -171,18 +213,39 @@ function Ingredientes() {
                 type="checkbox"
                 checked={esSano}
                 onChange={(e) =>
-                  setEsSano(e.target.checked)}
+                  setEsSano(e.target.checked)
+                }
               />
               {' '}Saludable
             </label>
           </div>
 
-          <button
-            onClick={crearIngrediente}
-            className="bg-green-500 text-white px-4 py-2 rounded mt-4"
-          >
-            Guardar ingrediente
-          </button>
+          <div className="mt-4 flex gap-2">
+            {ingredienteEditando ? (
+              <>
+                <button
+                  onClick={actualizarIngrediente}
+                  className="bg-yellow-500 text-white px-4 py-2 rounded"
+                >
+                  Actualizar ingrediente
+                </button>
+
+                <button
+                  onClick={limpiarFormulario}
+                  className="bg-gray-500 text-white px-4 py-2 rounded"
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={crearIngrediente}
+                className="bg-green-500 text-white px-4 py-2 rounded"
+              >
+                Guardar ingrediente
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -229,15 +292,25 @@ function Ingredientes() {
                   : 'No'}
               </p>
 
-              <button
-                onClick={() =>
-                  eliminarIngrediente(
-                    ingrediente.id
-                  )}
-                className="bg-red-500 text-white px-4 py-2 rounded mt-4"
-              >
-                Eliminar
-              </button>
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={() =>
+                    cargarIngrediente(ingrediente)
+                  }
+                  className="bg-yellow-500 text-white px-4 py-2 rounded"
+                >
+                  Editar
+                </button>
+
+                <button
+                  onClick={() =>
+                    eliminarIngrediente(ingrediente.id)
+                  }
+                  className="bg-red-500 text-white px-4 py-2 rounded"
+                >
+                  Eliminar
+                </button>
+              </div>
             </div>
           ))}
         </div>
