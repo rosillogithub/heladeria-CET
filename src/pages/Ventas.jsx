@@ -15,7 +15,7 @@ export default function Ventas() {
       .select('*')
 
     if (error) {
-      console.error(error)
+      console.error('Error cargando productos:', error)
       return
     }
 
@@ -24,17 +24,21 @@ export default function Ventas() {
 
   const venderProducto = async (producto) => {
     try {
+      console.log('Producto seleccionado:', producto)
+
       // 1. Obtener relaciones producto-ingrediente
       const { data: relaciones, error: errorRelaciones } = await supabase
         .from('producto_ingrediente')
         .select('*')
-        .eq('producto_id', producto.id)
+        .eq('producto_id', Number(producto.id)) // 🔥 FIX CLAVE
 
       if (errorRelaciones) {
-        console.error(errorRelaciones)
-        alert('Error consultando ingredientes')
+        console.error('Error relaciones:', errorRelaciones)
+        alert('Error consultando ingredientes del producto')
         return
       }
+
+      console.log('Relaciones encontradas:', relaciones)
 
       if (!relaciones || relaciones.length === 0) {
         alert('Este producto no tiene ingredientes configurados')
@@ -50,12 +54,12 @@ export default function Ventas() {
           .single()
 
         if (error) {
-          console.error(error)
+          console.error('Error ingrediente:', error)
           alert('Error consultando inventario')
           return
         }
 
-        const consumo = r.cantidad || 1
+        const consumo = 1 // en tu modelo actual siempre es 1
 
         if (ingrediente.inventario < consumo) {
           alert(`No hay inventario suficiente para ${ingrediente.nombre}`)
@@ -72,12 +76,12 @@ export default function Ventas() {
           .single()
 
         if (error) {
-          console.error(error)
+          console.error('Error update ingrediente:', error)
           alert('Error actualizando inventario')
           return
         }
 
-        const consumo = r.cantidad || 1
+        const consumo = 1
 
         await supabase
           .from('ingredientes')
@@ -92,22 +96,25 @@ export default function Ventas() {
         .from('ventas')
         .insert([
           {
-            producto_id: producto.id,
+            producto_id: Number(producto.id),
             cantidad: 1,
             total: producto.precio_publico,
           },
         ])
 
       if (errorVenta) {
-        console.error(errorVenta)
+        console.error('Error venta:', errorVenta)
         alert('Error registrando venta')
         return
       }
 
       alert('Producto vendido 🍦')
 
+      // refrescar productos si quieres ver cambios inmediatos
+      // await cargarProductos()
+
     } catch (error) {
-      console.error(error)
+      console.error('Error inesperado:', error)
       alert('Ocurrió un error inesperado')
     }
   }
