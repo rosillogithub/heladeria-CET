@@ -2,12 +2,8 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
-  const { user, setUser } = useAuth()
-
-  const logout = () => {
-    setUser(null)
-  }
-
+  const { user, logout } = useAuth()
+  
   return (
     <nav className="bg-pink-500 text-white p-4 flex justify-between">
       <h1 className="text-2xl font-bold">
