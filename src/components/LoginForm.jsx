@@ -7,7 +7,7 @@ function LoginForm() {
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
 
-  const { setUser } = useAuth()
+  const { login } = useAuth()
 
   const navigate = useNavigate()
 
@@ -26,7 +26,7 @@ function LoginForm() {
       return
     }
 
-    setUser(data)
+    login(data, data.rol)
 
     navigate('/')
   }
