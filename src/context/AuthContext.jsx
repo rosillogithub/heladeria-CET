@@ -8,6 +8,7 @@ Este archivo crea un “contexto global” de autenticación. Es decir:
 Sin Context API se tendría que pasar el usuario manualmente entre componentes
 */
 
+/*
 import { createContext, useContext, useState } from 'react'
 
 const AuthContext = createContext()    // Aquí nace el contenedor global.
@@ -26,5 +27,33 @@ export const AuthProvider = ({ children }) => {
 
 // <AuthContext.Provider value={{ user, setUser }}>  permite hacer: const { user } = useAuth()
 // desde cualquier componente
+
+export const useAuth = () => useContext(AuthContext)
+*/
+
+import { createContext, useContext, useState } from 'react'
+
+const AuthContext = createContext()
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null)
+  const [role, setRole] = useState(null)
+
+  const login = (userData, userRole) => {
+    setUser(userData)
+    setRole(userRole)
+  }
+
+  const logout = () => {
+    setUser(null)
+    setRole(null)
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, role, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
 
 export const useAuth = () => useContext(AuthContext)
