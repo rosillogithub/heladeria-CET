@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../api/supabase'
 import Navbar from '../components/Navbar'
+import VentaCard from '../components/VentaCard'
 
 export default function Ventas() {
   const [productos, setProductos] = useState([])
@@ -130,25 +131,11 @@ export default function Ventas() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {productos.map((producto) => (
-            <div
+            <VentaCard
               key={producto.id}
-              className="bg-white p-6 rounded-xl shadow"
-            >
-              <h2 className="text-2xl font-bold">
-                {producto.nombre}
-              </h2>
-
-              <p className="mt-2">
-                Precio: ${producto.precio_publico}
-              </p>
-
-              <button
-                onClick={() => venderProducto(producto)}
-                className="bg-pink-500 text-white px-4 py-2 rounded mt-4"
-              >
-                Vender
-              </button>
-            </div>
+              producto={producto}
+              onVender={venderProducto}
+            />
           ))}
         </div>
       </div>
